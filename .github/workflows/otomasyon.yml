@@ -1,0 +1,39 @@
+name: Firat Duyuru Kontrol
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Her saat başı otomatik çalışır
+  workflow_dispatch:    # GitHub üzerinden manuel çalıştırma butonu ekler
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Botun son_duyuru.txt dosyasını repoya geri kaydedebilmesi için şart
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Kütüphaneleri Yükle
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Botu Çalıştır
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        # Senin dosya adın duyuru_botu.py olduğu için onu çalıştırıyoruz
+        run: python duyuru_botu.py
+
+      - name: Hafızayı Güncelle (Unutkanlık Çözümü)
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add son_duyuru.txt || echo "Kaydedilecek yeni bir duyuru yok."
+          git commit -m "Bot: Son duyuru hafızaya alındı [skip ci]" || echo "Değişiklik yok."
+          git push || echo "Push işlemi atlandı."
