@@ -34,6 +34,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
-          git add son_duyuru.txt || echo "Kaydedilecek yeni bir duyuru yok."
+          git add *.txt || echo "Kaydedilecek yeni bir duyuru yok."
           git commit -m "Bot: Son duyuru hafızaya alındı [skip ci]" || echo "Değişiklik yok."
           git push || echo "Push işlemi atlandı."
