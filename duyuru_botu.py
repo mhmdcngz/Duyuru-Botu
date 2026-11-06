@@ -37,7 +37,7 @@ SITELER = [
 def telegram_mesaj_gonder(mesaj):
     api_url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     parametreler = {"chat_id": CHAT_ID, "text": mesaj}
-    requests.post(api_url, data=parametreler)
+    requests.post(api_url, data=parametreler, timeout=20)
 
 def duyurulari_kontrol_et():
     for site in SITELER:
@@ -48,7 +48,11 @@ def duyurulari_kontrol_et():
         dosya_adi = site["dosya_adi"]
 
         print(f"[{isim}] Site kontrol ediliyor...")
-        response = requests.get(url)
+        try:
+            response = requests.get(url, timeout=20)
+        except requests.exceptions.RequestException as hata:
+            print(f"[{isim}] Siteye bağlanılamadı, atlanıyor: {hata.__class__.__name__}")
+            continue
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, "html.parser")
